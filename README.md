@@ -8,7 +8,7 @@ This webinar will teach participants how to complete a text analysis in R, inclu
 As a result of this webinar, participants will be able to: 
 - Prepare data for a text analysis in R. 
 - Conduct text mining in R.
-- Complete a sentiment analysis in R. 
+- Complete sentiment analysis in R. 
 
 **Materials developed by Jenn Schilling.**  
 
