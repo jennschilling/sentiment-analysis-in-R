@@ -27,8 +27,8 @@ library(rtweet)
 
 ```{r pull-data}
 
-tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats", 
-                        n = 500,
+tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats OR #UniversityOfArizona OR #WildcatReady OR #WildcatPride", 
+                        n = 1000,
                         include_rts = FALSE,
                         `-filter` = "replies",
                         lang = "en")
