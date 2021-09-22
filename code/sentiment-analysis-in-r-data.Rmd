@@ -38,9 +38,8 @@ tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats OR #UniversityOfArizo
 
 ```{r save-data}
 
-write_csv(tweets %>% select(created_at, screen_name, text, source,
-                            is_quote, is_retweet, favorite_count,
-                            retweet_count, quote_count, reply_count),
+write_csv(tweets %>% select(status_id, created_at, screen_name, text, source,
+                            is_quote, is_retweet, favorite_count, retweet_count),
           here("data", "uarizona_tweets.csv"),
           append = TRUE)
 
