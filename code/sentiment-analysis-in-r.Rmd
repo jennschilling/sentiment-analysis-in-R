@@ -5,6 +5,8 @@ date: "9/16/2021"
 output: html_document
 ---
 
+# Introduction
+
 This file contains the code for webinar: [Sentiment Analysis in R](https://www.airweb.org/collaborate-learn/calendar/2021/10/20/event/sentiment-analysis-in-r), presented for the Association for Institutional Research, October 20 & 22 2021.  
 
 **Webinar Details**  
@@ -17,6 +19,10 @@ As a result of this webinar, participants will be able to:
 
 **Materials developed by Jenn Schilling.**  
 
+# Setup
+
+Load libraries and tweet data.
+
 ```{r setup, message = FALSE}
 
 library(here) # working directory
@@ -24,8 +30,51 @@ library(tidyverse) # data processing and plotting
 library(tidytext) # text analysis
 
 # Read data
-text_data <- read_csv(here("data", "uarizona_tweets.csv"), )
+text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
+
+```
+
+# Data Processing
+
+The first step is to understand and process the data. This particular dataset is a subset of what is pulled from the {rtweet} package. The full data includes more details about the tweet and engagement with it, but this subset includes the date, user, tweet text, source, and a few other metrics that may be of interest. 
+
+Now maybe you do not want to look at tweets, the same process we are going to walk through in this webinar could be used for any type of text data. I pulled Twitter data to use publicly accessible data that is relevant to my institution, using hashtags that are related to my university, so that I would have a good demonstration dataset. But this same process would work with any text dataset, you would just adjust the code to read the data in the "Setup" chunk above.
+
+```{r view-data}
+
+# First let's look at the data
+View(text_data)
+
+# Check the number of rows and columns
+dim(text_data)
+
+# View the data types of the columns
+glimpse(text_data)
+
+```
+
+Once we have a basic understanding of the data, we need to process it. We will need to expand contractions, remove special characters and emojis, and make everything lowercase.
+
+```{r process-data}
+
+# Expand contractions
+
+# Remove special characters
+
+# Remove emojis
+
+# Lowercase
+
 
 ```
 
 
+# Tokenizing
+
+# Word Frequencies
+
+# Sentiment Analysis
+
+# Visualizing Results
+
+# Moving Beyond Words
