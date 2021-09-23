@@ -36,9 +36,11 @@ text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALS
 
 # Data Processing
 
-The first step is to understand and process the data. This particular dataset is a subset of what is pulled from the {rtweet} package. The full data includes more details about the tweet and engagement with it, but this subset includes the date, user, tweet text, source, and a few other metrics that may be of interest. 
+The first step is to understand and process the data. This particular dataset is a subset of what is pulled from the `rtweet` package. The full data includes more details about the tweet and engagement with it, but this subset includes the date, user, tweet text, source, and a few other metrics that may be of interest. 
 
 Now maybe you do not want to look at tweets, the same process we are going to walk through in this webinar could be used for any type of text data. I pulled Twitter data to use publicly accessible data that is relevant to my institution, using hashtags that are related to my university, so that I would have a good demonstration dataset. But this same process would work with any text dataset, you would just adjust the code to read the data in the "Setup" chunk above.
+
+One important part of text analysis is having an identification column. Since we will eventually be creating a data frame of individual words, we want to be able to tie those words back to the original text (in this case, tweet). Having an identification column allows us to tie back to the original text. In this case, we will use the `status_id` field to identify each tweet.
 
 ```{r view-data}
 
@@ -53,18 +55,32 @@ glimpse(text_data)
 
 ```
 
-Once we have a basic understanding of the data, we need to process it. We will need to expand contractions, remove special characters and emojis, and make everything lowercase.
+Once we have a basic understanding of the data, we need to process it. We will need to expand contractions, remove special characters and emojis, and make everything lowercase. We also want to make the `status_id` column a character column instead of a numeric column.
 
 ```{r process-data}
 
+text_data_processed <- text_data %>%
+  
 # Expand contractions
-
-# Remove special characters
-
+  mutate() %>%
+  
 # Remove emojis
-
+  mutate(text = gsub("\U0001", "", text)) %>%
+  
+# Remove links
+  mutate(text = gsub("(https:|http:).*", "", text)) %>%
+  
+# Remove special characters
+  mutate(text =  gsub("[^a-zA-Z0-9 ]", " ", text)) %>%
+  
 # Lowercase
-
+  mutate(text = str_to_lower(text)) %>%
+  
+# Remove extra whitespace
+  mutate(text = str_squish(text)) %>%
+  
+# Make identification column a character
+  mutate(status_id = as.character(status_id))
 
 ```
 
