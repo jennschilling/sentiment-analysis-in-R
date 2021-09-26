@@ -61,8 +61,18 @@ Once we have a basic understanding of the data, we need to process it. We will n
 
 text_data_processed <- text_data %>%
   
+# Lowercase
+  mutate(text = str_to_lower(text)) %>%
+  
 # Expand contractions
-  mutate() %>%
+  mutate(text = gsub("n't|n’t", " not", text),
+         text = gsub("'ll|’ll", " will", text),
+         text = gsub("'re|’re", " are", text),
+         text = gsub("'ve|’ve", " have", text),
+         text = gsub("'m|’m", " am", text),
+         text = gsub("'d|’d", " would", text),
+         text = gsub("it's|it’s", "it is", text), 
+         text = gsub("'s|’s", "", text)) %>%
   
 # Remove emojis
   mutate(text = gsub("\U0001", "", text)) %>%
@@ -72,9 +82,6 @@ text_data_processed <- text_data %>%
   
 # Remove special characters
   mutate(text =  gsub("[^a-zA-Z0-9 ]", " ", text)) %>%
-  
-# Lowercase
-  mutate(text = str_to_lower(text)) %>%
   
 # Remove extra whitespace
   mutate(text = str_squish(text)) %>%
