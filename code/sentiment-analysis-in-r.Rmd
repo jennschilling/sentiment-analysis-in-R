@@ -55,7 +55,7 @@ glimpse(text_data)
 
 ```
 
-Once we have a basic understanding of the data, we need to process it. We will need to expand contractions, remove special characters and emojis, and make everything lowercase. We also want to make the `status_id` column a character column instead of a numeric column.
+Once we have a basic understanding of the data, we need to process it. We will first make all the text lowercase. Then we need to expand contractions, remove special characters and emojis, and remove extra whitespace. We also want to make the `status_id` column a character column instead of a numeric column.
 
 ```{r process-data}
 
