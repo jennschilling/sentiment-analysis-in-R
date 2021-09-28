@@ -281,10 +281,86 @@ ggplot(data = day_words %>%
 
 Another way to look at word frequencies is to compare the number of times a word is used with the number of documents it is used in. The inverse document frequency gives more weight to words that are not used as much across the documents. In our example, a document is a tweet. So a higher value for inverse document frequency means that a word is not used across the tweets while a lower value means that a word is used in many tweets. The *tf-idf* is the multiplication of the term (or word) frequency and the inverse document frequency - it can tell us how important a word is in the collection of documents (or in this case tweets).
 
-```{r}
+```{r tf-idf}
 
 View(total_tweet_words)
 
+# Compute frequency of word by tweet
+total_tweet_words <- total_tweet_words %>%
+  mutate(freq = n / total_words)
+
+View(total_tweet_words)
+
+# Because there are so many individual tweets, we will first look at total words
+# each day and the frequency of each word 
+total_day_words <- day_words %>%
+  group_by(created_at_date) %>%
+  summarise(total_words = sum(n),
+            .groups = "drop")
+
+total_day_words <- left_join(day_words, total_day_words, by = "created_at_date") %>%
+  mutate(freq = n / total_words) 
+
+View(total_day_words)
+
+# Create a plot of the total words in each day
+ggplot(data = total_day_words,
+       mapping = aes(x = freq)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~created_at_date,
+              scales = "free") +
+  scale_x_continuous(limits = c(0, 0.09)) +
+  labs(x = "Word Frequency",
+       y = "Count") +
+  theme_classic()
+
+# Notice that there are only a few words that occur frequently and most words occur rarely
+
+# Usually, you would do this analysis for each document (i.e. tweet), but since
+# we have a large number of tweets, I grouped the data together by day instead.
+# When analyzing data from a survey, the "documents" might be each open-ended
+# question; for course evaluations, the "documents" might be each class. For 
+# other text analysis applications, the documents could be individual books, 
+# speeches, websites, etc.
+# For tweets, we could also group the data into documents for each user 
+# or we could use a hashtag to create a document.
+
+# Next we will use the bind_tf_idf() function to compute the tf-idf statistic
+# We will keep the data grouped into "documents" of days, and this analysis
+# will tell us which words are important each day but not too common across
+# the days.
+
+# Compute tf, idf, and tf-idf
+day_tf_idf <- day_words %>%
+  bind_tf_idf(word, created_at_date, n)
+
+View(day_tf_idf) 
+# tf = term frequency
+# idf = inverse document frequency
+# tf_idf = term frequency * inverse document frequency 
+
+# View words with high tf-idf
+day_tf_idf %>%
+  arrange(-tf_idf)
+
+# Plot words with high tf-idf by day
+ggplot(data = day_tf_idf %>%
+         group_by(created_at_date) %>%
+         top_n(5, tf_idf) %>%
+         ungroup %>%
+         mutate(created_at_date = as.factor(created_at_date),
+                word = reorder_within(word, tf_idf, created_at_date)),
+       mapping = aes(y = word,
+                     x = tf_idf)) +
+  geom_col() +
+  facet_wrap(~created_at_date,
+             scales = "free") +
+  labs(title = "Important Words Each Day",
+       x = "TF-IDF",
+       y = "") +
+  scale_y_reordered() +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
 
 ```
 
