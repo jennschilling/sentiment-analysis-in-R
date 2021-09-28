@@ -658,3 +658,54 @@ ggplot(data = tweet_words_nrc_all_date,
 
 
 # Moving Beyond Words
+
+So far we have only looked at individual words. We may want to consider sets of words or whole sentences. We can do this by either breaking the text into sections using some sort of consistent header (for example, "chapter" in a book) or by using a fixed grouping of the words. In our example, we have already looked at sentiment by tweet because each tweet was its own document, but there may be cases in a text analysis where there are multiple entries in each document. For example, each document might be a survey question so there would be multiple responses within each document. It might be useful to analyze the responses together, or there might be an interest in breaking them into individual responses or some other categorization. 
+
+Another reason we might want to do this is that single words on their own may hide meaning that words together may show. For example, "I am not feeling good today" would end up with positive sentiment due to "good" and "feeling", but it is not really a positive statement. In this section, we will look at how to create n-grams, or sets of words together.
+
+```{r n-gram}
+
+# Get sets of two words
+text_ngrams <- text_data_processed %>%
+  unnest_tokens(ngram, text, token = "ngrams", n = 2)
+
+View(text_ngrams) # note that words are duplicated
+
+dim(text_ngrams)
+
+# Remove stop words
+text_ngrams <- text_ngrams %>%
+  separate(ngram, c("word_1", "word_2"), sep = " ") %>%
+  anti_join(stop_words, by = c("word_1" = "word")) %>%
+  anti_join(stop_words, by = c("word_2" = "word")) %>%
+  unite(ngram, word_1, word_2, sep = " ")
+
+View(text_ngrams) # note that words are duplicated
+
+dim(text_ngrams)
+
+# Get counts of n-grams
+text_ngrams_freq <- text_ngrams %>%
+  count(ngram, sort = TRUE)
+
+View(text_ngrams_freq)
+
+# Plot top n-grams
+ggplot(data = text_ngrams_freq %>% 
+         top_n(10),
+       mapping = aes(y = reorder(ngram, n),
+                     x = n)) +
+  geom_col() +
+  labs(title = "Most Frequently Used 2-Word Phrases",
+       x = "Count",
+       y = "") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
+
+# Create word cloud
+text_ngrams_freq %>% 
+  with(wordcloud(ngram, n, max.words = 25))
+
+
+```
+
