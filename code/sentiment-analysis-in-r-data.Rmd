@@ -34,14 +34,38 @@ tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats OR #UniversityOfArizo
                         lang = "en")
 
 ```
+```{r remove-duplicates}
+
+# Pull tweets already saved and remove any duplicates
+
+old_tweets <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
+
+comb_tweets <- rbind(old_tweets,
+                     tweets %>% select(status_id, created_at, screen_name, text, source,
+                            is_quote, is_retweet, favorite_count, retweet_count))
+
+unique_tweets <- unique(comb_tweets)
+
+
+
+```
 
 
 ```{r save-data}
 
-write_csv(tweets %>% select(status_id, created_at, screen_name, text, source,
-                            is_quote, is_retweet, favorite_count, retweet_count),
+# First time pulling tweets
+
+# write_csv(tweets %>% select(status_id, created_at, screen_name, text, source,
+#                             is_quote, is_retweet, favorite_count, retweet_count),
+#           here("data", "uarizona_tweets.csv"),
+#           append = FALSE)
+
+# Later times pulling tweets
+
+write_csv(unique_tweets,
           here("data", "uarizona_tweets.csv"),
           append = FALSE)
+
 
 ```
 
