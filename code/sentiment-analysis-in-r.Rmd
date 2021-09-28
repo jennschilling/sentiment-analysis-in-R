@@ -160,7 +160,36 @@ ggplot(data = text_data_processed,
 
 # Tokenizing
 
-After processing the data, the next step in a text analysis
+After processing the data, the next step in a text analysis is to get individual words. This is called tokenizing. Tokenizing involves splitting a long text string, such as a tweet, document, or open-ended responses, into individual words or sets of words. A token is a meaningful unit of text, such as a word. For text analysis, we can create a tidy text data table or data frame which contains one token per row. 
+
+There is a simple function in the `tidytext` that will  complete the tokenizing process for us called `unnest_tokens()`. This will create a new data frame with one row for each word in the text and a new column with each word.
+
+After tokenizing, we will remove stop words, which are common words in the English language that are not useful for text analysis. These are words such as "and", "the", "can", "a", etc.
+
+```{r}
+
+# Tokenize the text data to get each individual word
+text_tokens <- text_data_processed %>%
+  unnest_tokens(word, text)
+
+# Let's see what the new table looks like
+View(text_tokens)
+
+dim(text_tokens)
+
+# Let's take a look at the stop words list
+View(stop_words)
+
+# Now remove the stop words
+text_tokens <- anti_join(text_tokens, stop_words, by = "word")
+
+# Look at the tokenized data frame again
+View(text_tokens)
+
+dim(text_tokens) # notice the drop in the row count now that stop words are gone
+
+```
+
 
 # Word Frequencies
 
