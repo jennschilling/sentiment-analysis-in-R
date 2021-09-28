@@ -364,7 +364,6 @@ ggplot(data = day_tf_idf %>%
 
 ```
 
-
 # Sentiment Analysis
 
 # Visualizing Results
