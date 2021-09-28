@@ -38,13 +38,15 @@ tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats OR #UniversityOfArizo
 
 # Pull tweets already saved and remove any duplicates
 
-old_tweets <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
+old_tweets <- read_csv(here("data", "uarizona_tweets.csv"), 
+                       show_col_types = FALSE,
+                       lazy = FALSE)
 
 comb_tweets <- rbind(old_tweets,
                      tweets %>% select(status_id, created_at, screen_name, text, source,
                             is_quote, is_retweet, favorite_count, retweet_count))
 
-unique_tweets <- unique(comb_tweets)
+unique_tweets <- distinct(comb_tweets, status_id, .keep_all = TRUE)
 
 
 
