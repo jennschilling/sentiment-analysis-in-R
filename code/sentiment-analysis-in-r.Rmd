@@ -29,6 +29,7 @@ library(here) # working directory
 library(tidyverse) # data processing and plotting
 library(tidytext) # text analysis
 library(wordcloud) # word cloud 
+library(scales) # number formatting
 
 # Read data
 text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
@@ -608,6 +609,50 @@ ggplot(data = tweet_words_all,
   theme_classic() +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
+
+# Finally, let's look at the different feelings of each tweet
+tweet_words_nrc_all <- inner_join(nrc %>% filter(sentiment != "positive" & sentiment != "negative"),
+                                  tweet_words, by = "word") %>%
+  count(status_id, sentiment)
+
+View(tweet_words_nrc_all)
+
+tweet_words_nrc_all_total <- tweet_words_nrc_all %>%
+  count(sentiment) %>%
+  mutate(sentiment = reorder(sentiment, n))
+
+ggplot(data = tweet_words_nrc_all_total,
+       mapping = aes(x = n,
+                     y = sentiment)) +
+  geom_col()  +
+  labs(title = "Tweet Sentiments",
+       x = "Number of Tweets",
+       y = "Sentiment") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic() 
+
+# Let's look at tweet sentiments by day
+tweet_words_nrc_all_date <- text_data_processed %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  select(status_id, created_at_date) %>%
+  right_join(tweet_words_nrc_all, by = "status_id") %>%
+  count(created_at_date, sentiment) %>%
+  mutate(sentiment = reorder_within(sentiment, n, created_at_date))
+
+ggplot(data = tweet_words_nrc_all_date,
+       mapping = aes(x = n,
+                     y = sentiment)) +
+  geom_col() +
+  facet_wrap(~ created_at_date,
+             scales = "free") +
+  labs(title = "Sentiment by Day",
+       x = "Number of Tweets",
+       y = "") +
+  scale_y_reordered() +
+  scale_x_continuous(expand = c(0, 0),
+                     labels = number_format(accuracy = 1)) +
+  theme_classic()
+
 
 ```
 
