@@ -91,8 +91,76 @@ text_data_processed <- text_data %>%
 
 ```
 
+Now that the text processing is complete, let's take another look at the data.
+
+```{r check-data}
+
+# View the columns and a few records
+glimpse(text_data_processed)
+
+# Plot number of tweets over time
+tweets_time <- text_data_processed %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  group_by(created_at_date) %>%
+  summarise(n = n(),
+            .groups = "drop")
+
+ggplot(data = tweets_time,
+       mapping = aes(x = created_at_date,
+                     y = n,
+                     group = 1)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(tweets_time$created_at_date),
+                                  max(tweets_time$created_at_date),
+                                  "weeks")) +
+  labs(x = "Date",
+       y = "Number of Tweets") +
+  theme_classic()
+
+
+# Plot number of screen names over time
+tweets_user <- text_data_processed %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  select(created_at_date, screen_name) %>%
+  unique(.) %>%
+  group_by(created_at_date) %>%
+  summarise(n = n(),
+            .groups = "drop")
+
+ggplot(data = tweets_user,
+       mapping = aes(x = created_at_date,
+                     y = n,
+                     group = 1)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(tweets_user$created_at_date),
+                                  max(tweets_user$created_at_date),
+                                  "weeks")) +
+  labs(x = "Date",
+       y = "Number of Users") +
+  theme_classic()
+
+# Plot histograms of favorite count and retweet count
+ggplot(data = text_data_processed,
+       mapping = aes(x = favorite_count)) +
+  geom_histogram(bins = 10) +
+  labs(x = "Favorite Count",
+       y = "Count") +
+  theme_classic()
+
+ggplot(data = text_data_processed,
+       mapping = aes(x = retweet_count)) +
+  geom_histogram(bins = 10) +
+  labs(x = "Retweet Count",
+       y = "Count") +
+  theme_classic()
+
+
+```
+
 
 # Tokenizing
+
+After processing the data, the next step in a text analysis
 
 # Word Frequencies
 
