@@ -46,7 +46,7 @@ comb_tweets <- rbind(old_tweets,
                      tweets %>% select(status_id, created_at, screen_name, text, source,
                             is_quote, is_retweet, favorite_count, retweet_count))
 
-unique_tweets <- distinct(comb_tweets, status_id, .keep_all = TRUE)
+unique_tweets <- distinct(comb_tweets, text, .keep_all = TRUE)
 
 
 
