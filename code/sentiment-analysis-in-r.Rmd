@@ -28,6 +28,7 @@ Load libraries and tweet data.
 library(here) # working directory
 library(tidyverse) # data processing and plotting
 library(tidytext) # text analysis
+library(wordcloud) # word cloud 
 
 # Read data
 text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
@@ -82,6 +83,9 @@ text_data_processed <- text_data %>%
   
 # Remove special characters
   mutate(text =  gsub("[^a-zA-Z0-9 ]", " ", text)) %>%
+  
+# Remove ampersand notation
+  mutate(text = gsub("amp", "", text)) %>%
   
 # Remove extra whitespace
   mutate(text = str_squish(text)) %>%
@@ -188,10 +192,102 @@ View(text_tokens)
 
 dim(text_tokens) # notice the drop in the row count now that stop words are gone
 
+
 ```
 
 
 # Word Frequencies
+
+Now that we have a data frame with the individual words, we can begin to do some analysis of the text and the words used. We can examine word frequencies and look at the most used words. We can look at word frequencies over time or by user. We can also investigate the number of words in each tweet. 
+
+First, we are going to create a few different word count data frames. Then we will make some plots to look at the words used in the data.
+
+```{r word-freq}
+
+# Count number of times a word appears in each tweet
+tweet_words <- text_tokens %>%
+  count(status_id, word, sort = TRUE)
+
+View(tweet_words)
+
+# Count the number of words in each tweet
+total_words <- tweet_words %>%
+  group_by(status_id) %>%
+  summarise(total_words = sum(n))
+
+View(total_words)
+
+# Put the counts together
+total_tweet_words <- left_join(tweet_words, total_words, by = "status_id")
+
+View(total_tweet_words)
+
+# Count word frequencies overall
+tweet_word_freq <- text_tokens %>%
+  count(word, sort = TRUE)
+
+View(tweet_word_freq)
+
+# View top words
+ggplot(data = tweet_word_freq %>% 
+         top_n(15),
+       mapping = aes(y = reorder(word, n),
+                     x = n)) +
+  geom_col() +
+  labs(title = "Most Frequently Used Words",
+       x = "Word Count",
+       y = "") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
+
+# Create word cloud
+tweet_word_freq %>% 
+  with(wordcloud(word, n, max.words = 100))
+
+
+# Word frequency by day
+day_words <- text_tokens %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  count(created_at_date, word, sort = TRUE) 
+
+View(day_words)
+
+# Plot word frequencies by day
+ggplot(data = day_words %>%
+         group_by(created_at_date) %>%
+         top_n(5) %>%
+         ungroup %>%
+         mutate(created_at_date = as.factor(created_at_date),
+                word = reorder_within(word, n, created_at_date)),
+       mapping = aes(y = word,
+                     x = n)) +
+  geom_col() +
+  facet_wrap(~created_at_date,
+             scales = "free") +
+  labs(title = "Most Frequently Used Words Each Day",
+       x = "Word Count",
+       y = "") +
+  scale_y_reordered() +
+  scale_x_continuous(limits = c(0, 45),
+                     expand = c(0, 0)) +
+  theme_classic()
+
+
+```
+
+
+
+# Term Frequency - Inverse Document Frequency
+
+Another way to look at word frequencies is to compare the number of times a word is used with the number of documents it is used in. The inverse document frequency gives more weight to words that are not used as much across the documents. In our example, a document is a tweet. So a higher value for inverse document frequency means that a word is not used across the tweets while a lower value means that a word is used in many tweets. The *tf-idf* is the multiplication of the term (or word) frequency and the inverse document frequency - it can tell us how important a word is in the collection of documents (or in this case tweets).
+
+```{r}
+
+View(total_tweet_words)
+
+
+```
+
 
 # Sentiment Analysis
 
