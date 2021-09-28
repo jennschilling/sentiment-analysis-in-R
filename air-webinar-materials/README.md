@@ -29,6 +29,6 @@ As a result of this webinar, participants will be able to:
 
 3. Run the setup code chunks to load the libraries and read the data. Then run the rest of the code chunks in sequence to process the data and complete the text analysis. 
 
-Note: The three libraries used are `here`, `tidyverse`, and `tidytextr`. If you do not have these packages installed, be sure to complete the installation prior to running the code by running `install.packages(c('here', 'tidyverse', 'tidytext'))` in the Console of RStudio. 
+Note: The three libraries used are `here`, `tidyverse`, `tidytext`, and `wordcloud`. If you do not have these packages installed, be sure to complete the installation prior to running the code by running `install.packages(c('here', 'tidyverse', 'tidytext', 'wordcloud'))` in the Console of RStudio. 
 
 
