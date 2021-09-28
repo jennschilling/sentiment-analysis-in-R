@@ -366,6 +366,250 @@ ggplot(data = day_tf_idf %>%
 
 # Sentiment Analysis
 
-# Visualizing Results
+The data set of words used in each tweet or document can also be used to evaluate the sentiment or opinion/feeling of the text. Certainly an algorithmic approach to determining the emotions behind a piece of text is not as accurate as human coding, but using a lexicon (i.e. dictionary) of words and their corresponding sentiments, we can match up the feelings of certain words. Once we have the sentiment of individual words, we can estimate the sentiment of the whole tweet or document.
+
+There are three general lexicons in the {tidytext} package, and all three use single words.
+
+- AFINN assign words with a score between -5 (most negative) and 5 (most positive); negative scores have negative sentiment while positive scores have positive sentiment 
+- bing categorizes words into categories of positive or negative
+- nrc categorizes words into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust
+
+The function `get_sentiments()` with the name of the lexicon will retreive the desired lexicon.
+
+```{r sentiment}
+
+# View each lexicon
+get_sentiments("afinn")
+
+get_sentiments("bing")
+
+get_sentiments("nrc") # note that words can have multiple sentiments in nrc
+
+
+# Find common joy words in the tweets
+
+nrc_joy <- get_sentiments("nrc") %>%
+  filter(sentiment == "joy")
+
+View(nrc_joy)
+
+tweet_words_joy <- inner_join(tweet_word_freq,
+                              nrc_joy,
+                              by = "word")
+
+View(tweet_words_joy)
+
+# Find common disgust words in the tweets
+
+nrc_disgust <- get_sentiments("nrc") %>%
+  filter(sentiment == "disgust")
+
+View(nrc_disgust)
+
+tweet_words_disgust <- inner_join(tweet_word_freq,
+                                  nrc_disgust,
+                                  by = "word")
+
+View(tweet_words_disgust)
+
+# Plot joy and disgust together
+tweet_words_joy_disgust <- bind_rows(tweet_words_joy, tweet_words_disgust) %>%
+  group_by(sentiment) %>%
+  top_n(5, n) %>%
+  mutate(word = reorder_within(word, n, sentiment))
+
+ggplot(data = tweet_words_joy_disgust,
+       mapping = aes(x = n,
+                     y = word)) +
+  geom_col() +
+  facet_wrap(~ sentiment,
+             scales = "free") +
+  labs(title = "Most Frequent Words with Disgust and Joy Sentiments",
+       x = "Word Count",
+       y = "") +
+  scale_y_reordered() +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
+  
+
+# Looking and only positive and negative sentiment by word, we can evaluate the 
+# sentiment of each tweet or of a day of tweets.
+
+# First, let's get the sentiment of each word 
+bing <- get_sentiments("bing")
+
+sentiment_tweet_words <- inner_join(tweet_words,
+                                    bing,
+                                    by = "word")
+
+View(sentiment_tweet_words)
+
+# Next, we will count the number of positive and negative words per tweet
+pos_neg_per_tweet <- sentiment_tweet_words %>%
+  count(status_id, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n) %>%
+  mutate(positive = ifelse(is.na(positive), 0 , positive),
+         negative = ifelse(is.na(negative), 0, negative),
+         sentiment = positive - negative)
+
+View(pos_neg_per_tweet)
+
+# Let's plot the sentiments by tweet
+ggplot(data = pos_neg_per_tweet,
+       mapping = aes(x = status_id,
+                     y = sentiment)) +
+  geom_col() +
+  labs(title = "Sentiments by Tweet",
+       x = "",
+       y = "Sentiment") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+# We can also look at each tweet over time
+pos_neg_per_tweet_date <- text_data_processed %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  select(status_id, created_at_date) %>%
+  right_join(pos_neg_per_tweet, by = "status_id")
+
+# Now let's get the general sentiment each day
+ggplot(data = pos_neg_per_tweet_date,
+       mapping = aes(x = status_id,
+                     y = sentiment)) +
+  geom_col() +
+  facet_wrap(~created_at_date,
+             scales = "free") +
+  labs(title = "Sentiments by Tweet",
+       x = "",
+       y = "Sentiment") +
+  scale_y_continuous(limits = c(-3, 5),
+                     expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_blank())
+
+# Finally, let's find the general positive or negative sentiment for each day
+sentiment_day_words <- inner_join(day_words,
+                                  bing,
+                                  by = "word")
+
+View(sentiment_day_words)
+
+pos_neg_per_day <- sentiment_day_words %>%
+  count(created_at_date, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n) %>%
+  mutate(positive = ifelse(is.na(positive), 0 , positive),
+         negative = ifelse(is.na(negative), 0, negative),
+         sentiment = positive - negative)
+
+View(pos_neg_per_day)
+
+# Plot sentiment by day
+ggplot(data = pos_neg_per_day,
+       mapping = aes(x = created_at_date,
+                     y = sentiment)) +
+  geom_col() +
+  labs(title = "Sentiment by Day",
+       x = "",
+       y = "Sentiment") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme()
+
+# Next let's look at the most common positive and negative words overall
+sentiment_words <- sentiment_tweet_words %>%
+  group_by(sentiment, word) %>%
+  summarise(n = sum(n),
+            .groups = "drop")
+
+View(sentiment_words)
+
+# Plot the top 10
+sentiment_words_top <- sentiment_words %>%  
+  group_by(sentiment) %>%
+  top_n(10, n) %>% 
+  ungroup() %>%
+  mutate(word = reorder_within(word, n, sentiment))
+
+
+ggplot(data = sentiment_words_top,
+       mapping = aes(x = n,
+                     y = word)) +
+  geom_col() +
+  facet_wrap(~ sentiment,
+             scales = "free") +
+  labs(title = "Most Frequent Negative and Positive Words",
+       x = "Count",
+       y = "") +
+  scale_y_reordered() +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
+
+# Let's compare the lexicons
+afinn <- get_sentiments("afinn")
+
+nrc <- get_sentiments("nrc")
+
+table(bing$sentiment)
+
+table(nrc$sentiment)
+
+table(afinn$value)
+
+tweet_words_afinn <- inner_join(afinn, tweet_words, by = "word") %>%
+  group_by(status_id) %>%
+  summarise(sentiment = sum(value),
+            .groups = "drop") %>%
+  mutate(method = "AFINN") %>%
+  select(status_id, sentiment, method)
+
+tweet_words_nrc <- inner_join(nrc %>% filter(sentiment %in% c("positive", "negative")),
+                              tweet_words, by = "word") %>%
+  count(status_id, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n) %>%
+  mutate(positive = ifelse(is.na(positive), 0 , positive),
+         negative = ifelse(is.na(negative), 0, negative),
+         sentiment = positive - negative,
+         method = "nrc") %>%
+  select(status_id, sentiment, method)
+
+tweet_words_bing <- inner_join(bing, tweet_words, by = "word") %>%
+  count(status_id, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n) %>%
+  mutate(positive = ifelse(is.na(positive), 0 , positive),
+         negative = ifelse(is.na(negative), 0, negative),
+         sentiment = positive - negative,
+         method  = "bing") %>%
+  select(status_id, sentiment, method)
+
+tweet_words_all <- bind_rows(tweet_words_afinn,
+                             tweet_words_nrc,
+                             tweet_words_bing)
+
+View(tweet_words_all)
+
+ggplot(data = tweet_words_all,
+       mapping = aes(x = status_id,
+                     y = sentiment)) +
+  geom_col() +
+  labs(title = "Sentiments by Tweet",
+       x = "",
+       y = "Sentiment") +
+  facet_wrap(~ method,
+             scale = "free_y",
+             ncol = 1) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+```
+
 
 # Moving Beyond Words
