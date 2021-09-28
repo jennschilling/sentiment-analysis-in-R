@@ -48,6 +48,10 @@ comb_tweets <- rbind(old_tweets,
 
 unique_tweets <- distinct(comb_tweets, text, .keep_all = TRUE)
 
+# Remove tweets with hprwildcats since they are from a high school in NJ
+unique_tweets <- unique_tweets %>%
+  filter(!str_detect(text, "hprwildcats"))
+
 
 
 ```
