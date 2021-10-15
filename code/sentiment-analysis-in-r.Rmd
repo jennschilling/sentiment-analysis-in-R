@@ -44,6 +44,8 @@ Now maybe you do not want to look at tweets, the same process we are going to wa
 
 One important part of text analysis is having an identification column. Since we will eventually be creating a data frame of individual words, we want to be able to tie those words back to the original text (in this case, tweet). Having an identification column allows us to tie back to the original text. In this case, we will use the `status_id` field to identify each tweet.
 
+Being able to tie back the analyzed data to the original text can be useful to complete the analysis. For example, if you were analyzing course evaluations and you wanted to evaluate the sentiment of students by academic year in a course, or if you were analyzing an open-ended survey question and wanted to investigate the sentiment of students in different departments, you could use the identification column to join your final analyzed data back to the original text data and determine these segments. It is not in this particular dataset, but if we had the location data of the tweets, then we could look at the words used or sentiment of the tweets by zip code to get an idea of the impression of the university in different locations.
+
 ```{r view-data}
 
 # First let's look at the data
@@ -369,13 +371,15 @@ ggplot(data = day_tf_idf %>%
 
 The data set of words used in each tweet or document can also be used to evaluate the sentiment or opinion/feeling of the text. Certainly an algorithmic approach to determining the emotions behind a piece of text is not as accurate as human coding, but using a lexicon (i.e. dictionary) of words and their corresponding sentiments, we can match up the feelings of certain words. Once we have the sentiment of individual words, we can estimate the sentiment of the whole tweet or document.
 
-There are three general lexicons in the {tidytext} package, and all three use single words.
+There are three general lexicons in the `{tidytext}` package, and all three use single words.
 
 - AFINN assign words with a score between -5 (most negative) and 5 (most positive); negative scores have negative sentiment while positive scores have positive sentiment 
 - bing categorizes words into categories of positive or negative
 - nrc categorizes words into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust
 
-The function `get_sentiments()` with the name of the lexicon will retreive the desired lexicon.
+The function `get_sentiments()` with the name of the lexicon will retrieve the desired lexicon.
+
+You can add your own words to the sentiment dictionary if you'd like; this can be particularly helpful if there are keywords relevant to the topic of the text you are analyzing.
 
 ```{r sentiment}
 
