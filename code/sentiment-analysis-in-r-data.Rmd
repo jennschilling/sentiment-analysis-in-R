@@ -34,6 +34,8 @@ tweets <- search_tweets(q = "#UArizona OR #ArizonaWildcats OR #UniversityOfArizo
                         lang = "en")
 
 ```
+
+
 ```{r remove-duplicates}
 
 # Pull tweets already saved and remove any duplicates
@@ -51,6 +53,10 @@ unique_tweets <- distinct(comb_tweets, text, .keep_all = TRUE)
 # Remove tweets with hprwildcats since they are from a high school in NJ
 unique_tweets <- unique_tweets %>%
   filter(!str_detect(text, "hprwildcats"))
+
+# Remove tweets from StathamElem since they are from an elementary school
+unique_tweets <- unique_tweets %>%
+  filter(screen_name != "StathamElem")
 
 
 
