@@ -32,7 +32,8 @@ library(wordcloud) # word cloud
 library(scales) # number formatting
 
 # Read data
-text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE)
+text_data <- read_csv(here("data", "uarizona_tweets.csv"), show_col_types = FALSE) %>%
+  filter(created_at <= "2021-09-29")
 
 
 #### Data Processing ####
@@ -92,7 +93,7 @@ glimpse(text_data_processed)
 
 # Plot number of tweets over time
 tweets_time <- text_data_processed %>%
-  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
   group_by(created_at_date) %>%
   summarise(n = n(),
             .groups = "drop")
@@ -112,7 +113,7 @@ ggplot(data = tweets_time,
 
 # Plot number of screen names over time
 tweets_user <- text_data_processed %>%
-  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
   select(created_at_date, screen_name) %>%
   unique(.) %>%
   group_by(created_at_date) %>%
@@ -218,7 +219,7 @@ tweet_word_freq %>%
 
 # Word frequency by day
 day_words <- text_tokens %>%
-  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
   count(created_at_date, word, sort = TRUE) 
 
 View(day_words)
@@ -406,7 +407,7 @@ ggplot(data = pos_neg_per_tweet,
 
 # We can also look at each tweet over time
 pos_neg_per_tweet_date <- text_data_processed %>%
-  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
   select(status_id, created_at_date) %>%
   right_join(pos_neg_per_tweet, by = "status_id")
 
@@ -568,7 +569,7 @@ ggplot(data = tweet_words_nrc_all_total,
 
 # Let's look at tweet sentiments by day
 tweet_words_nrc_all_date <- text_data_processed %>%
-  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y")) %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
   select(status_id, created_at_date) %>%
   right_join(tweet_words_nrc_all, by = "status_id") %>%
   count(created_at_date, sentiment) %>%
@@ -632,6 +633,6 @@ ggplot(data = text_ngrams_freq %>%
 
 # Create word cloud
 text_ngrams_freq %>% 
-  with(wordcloud(ngram, n, max.words = 25))
+  with(wordcloud(ngram, n, max.words = 25, scale = c(1.5, .3)))
 
 
