@@ -1,14 +1,20 @@
 
-# title: "Sentiment Analysis in R"
-# author: "Jenn Schilling"
-# date: "10/21/2021"
+# Sentiment Analysis in R
+# Jenn Schilling
+# 10/20/2021 - 10/22/2021
 
 # Introduction
 
-# This file contains the code for webinar: [Sentiment Analysis in R](https://www.airweb.org/collaborate-learn/calendar/2021/10/20/event/sentiment-analysis-in-r), presented for the Association for Institutional Research, October 20 & 22 2021.  
+# This file contains the code for webinar: 
+# [Sentiment Analysis in R](https://www.airweb.org/collaborate-learn/calendar/2021/10/20/event/sentiment-analysis-in-r)
+# Presented for the Association for Institutional Research, October 20 & 22 2021.  
 
 # Webinar Details 
-# This webinar will teach participants how to complete a text analysis in R, including data processing and cleaning, visualization of word frequencies, and sentiment analysis. Sentiment analysis is useful for finding patterns in text data from open response questions on surveys and course evaluations as well as evaluating social media posts. This series is ideal for higher education professionals who have some experience in R and want to add text analysis to their R skills.
+# This webinar will teach participants how to complete a text analysis in R, including data processing and cleaning,
+# visualization of word frequencies, and sentiment analysis. Sentiment analysis is useful for finding patterns in 
+# text data from open response questions on surveys and course evaluations as well as evaluating social media posts.
+# This series is ideal for higher education professionals who have some experience in R and want to add text analysis 
+# to their R skills.
 
 # As a result of this webinar, participants will be able to: 
 # - Prepare data for a text analysis in R. 
