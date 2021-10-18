@@ -164,6 +164,8 @@ dim(text_tokens)
 # Let's take a look at the stop words list
 View(stop_words)
 
+table(stop_words$lexicon)
+
 # Now remove the stop words
 text_tokens <- anti_join(text_tokens, stop_words, by = "word")
 
@@ -437,6 +439,32 @@ View(sentiment_day_words)
 
 pos_neg_per_day <- sentiment_day_words %>%
   count(created_at_date, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n) %>%
+  mutate(positive = ifelse(is.na(positive), 0 , positive),
+         negative = ifelse(is.na(negative), 0, negative),
+         sentiment = positive - negative)
+
+View(pos_neg_per_day)
+
+# Plot sentiment by day
+ggplot(data = pos_neg_per_day,
+       mapping = aes(x = created_at_date,
+                     y = sentiment)) +
+  geom_col() +
+  labs(title = "Sentiment by Day",
+       x = "",
+       y = "Sentiment") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme()
+
+
+# A different way to compute sentiment per day
+pos_neg_per_day <- sentiment_day_words %>%
+  group_by(created_at_date, sentiment) %>%
+  summarise(n = sum(n),
+            .groups = "drop") %>%
   pivot_wider(names_from = sentiment,
               values_from = n) %>%
   mutate(positive = ifelse(is.na(positive), 0 , positive),
