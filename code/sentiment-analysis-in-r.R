@@ -58,14 +58,25 @@ text_data_processed <- text_data %>%
   mutate(text = str_to_lower(text)) %>%
   
 # Expand contractions
-  mutate(text = gsub("n't|n’t", " not", text),
-         text = gsub("'ll|’ll", " will", text),
-         text = gsub("'re|’re", " are", text),
-         text = gsub("'ve|’ve", " have", text),
-         text = gsub("'m|’m", " am", text),
-         text = gsub("'d|’d", " would", text),
-         text = gsub("it's|it’s", "it is", text), 
-         text = gsub("'s|’s", "", text)) %>%
+  # mutate(text = gsub("n't|n’t", " not", text),
+  #        text = gsub("'ll|’ll", " will", text),
+  #        text = gsub("'re|’re", " are", text),
+  #        text = gsub("'ve|’ve", " have", text),
+  #        text = gsub("'m|’m", " am", text),
+  #        text = gsub("'d|’d", " would", text),
+  #        text = gsub("it's|it’s", "it is", text), 
+  #        text = gsub("'s|’s", "", text)) %>%
+  
+# Alternate way to expand contractions
+  mutate(text = text %>%
+            str_replace("n't|n’t", " not") %>%
+            str_replace("'ll|’ll", " will") %>%
+            str_replace("'re|’re", " are") %>%
+            str_replace("'ve|’ve", " have") %>%
+            str_replace("'m|’m", " am") %>%
+            str_replace("'d|’d", " would") %>%
+            str_replace("it's|it’s", "it is") %>%
+            str_replace("'s|’s", " ")) %>%
   
 # Remove emojis
   mutate(text = gsub("\U0001", "", text)) %>%
