@@ -617,6 +617,35 @@ ggplot(data = tweet_words_nrc_all_date,
                      labels = number_format(accuracy = 1)) +
   theme_classic()
 
+# Another way to examine tweet sentiments by day
+tweet_words_nrc_all_date_alt <- text_data_processed %>%
+  mutate(created_at_date = as.Date(created_at, "%m/%d/%Y", tz = "UTC")) %>%
+  select(status_id, created_at_date) %>%
+  right_join(tweet_words_nrc_all, by = "status_id") %>%
+  pivot_wider(names_from = "sentiment",
+              values_from = "n",
+              values_fill = 0) %>%
+  pivot_longer(anticipation:disgust,
+               names_to = "sentiment",
+               values_to = "n") %>%
+  group_by(created_at_date,
+           sentiment) %>%
+  summarise(avg_sentiment = mean(n),
+            .groups = "drop")
+
+ggplot(data = tweet_words_nrc_all_date_alt,
+       mapping = aes(x = created_at_date,
+                     y = avg_sentiment,
+                     group = sentiment)) +
+  geom_line() +
+  facet_wrap(~ sentiment,
+             scales = "free_x") +
+  labs(title = "Average Sentiment by Day",
+       x = "Date",
+       y = "Average Sentiment") +
+  scale_y_continuous(expand = c(0, 0),
+                     labels = number_format(accuracy = 1)) +
+  theme_classic()
 
 
 #### Moving Beyond Words ####
