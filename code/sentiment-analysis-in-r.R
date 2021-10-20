@@ -278,7 +278,7 @@ ggplot(data = total_day_words,
               scales = "free") +
   scale_x_continuous(limits = c(0, 0.09)) +
   labs(x = "Word Frequency",
-       y = "Count") +
+       y = "Frequency") +
   theme_classic()
 
 # Compute tf, idf, and tf-idf
