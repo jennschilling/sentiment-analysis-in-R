@@ -67,7 +67,7 @@ text_data_processed <- text_data %>%
   #        text = gsub("it's|it’s", "it is", text), 
   #        text = gsub("'s|’s", "", text)) %>%
   
-# Alternate way to expand contractions
+# Alternate way to expand contractions - thank you Shiloh Fling!
   mutate(text = text %>%
             str_replace("n't|n’t", " not") %>%
             str_replace("'ll|’ll", " will") %>%
